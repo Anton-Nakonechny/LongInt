@@ -29,6 +29,6 @@ public:
 	void push_back(unsigned char);
 	void reserve(size_t size);
 	void grow();
+	void clear() {	for (size_t i = 0; i < count; i++) storage[i] = 0; }
 };
-
 #endif /* VECTOR_HPP_ */

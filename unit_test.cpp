@@ -2,17 +2,22 @@
 #include <stdexcept>
 #include <sstream>
 #include "LongInt.hpp"
-#include "Vector.hpp"
+#include "BitVector.hpp"
 
 
 #define LENGTH1 20
 #define VAL1 0xFF
 TEST(Vector, Construct) {
-	size_t size;
-	Vector vector(LENGTH1, VAL1);
-	ASSERT_TRUE(vector.size() == LENGTH1);
+	Vector vector1;
+	ASSERT_TRUE(vector1.size() == 0);
+	vector1.push_back(VAL1);
+	ASSERT_TRUE(vector1[0] == VAL1);
+	ASSERT_THROW(vector1[1], std::out_of_range);
+
+	Vector vector2(LENGTH1, VAL1);
+	ASSERT_TRUE(vector2.size() == LENGTH1);
 	for (size_t i = 0; i < LENGTH1; i++) {
-		ASSERT_TRUE(vector[i] == VAL1);
+		ASSERT_TRUE(vector2[i] == VAL1);
 	}
 }
 
@@ -31,6 +36,45 @@ TEST(Vector, Enlarge) {
 	}
 	for (size_t i = LENGTH2; i < LENGTH2 + ADDITIONAL_LENGTH; i++) {
 		ASSERT_TRUE(vector[i] == 0);
+	}
+}
+
+void push_n_check(BitVector &bv, size_t count)
+{
+	for (size_t i = 0; i < count; i++) {
+		bool val = i * 3 % 2;
+		bv.push_back(val);
+		ASSERT_TRUE(bv[bv.size() - 1] == val);
+	}
+}
+
+TEST(BitVector, Construct_Push_Back) {
+	size_t size;
+	BitVector bit_vector1;
+	ASSERT_TRUE(bit_vector1.size() == 0);
+	bit_vector1.push_back(true);
+	ASSERT_TRUE(bit_vector1[0] == true);
+	ASSERT_THROW(bit_vector1[1], std::out_of_range);
+	bit_vector1.push_back(false);
+	bit_vector1.push_back(true);
+	ASSERT_TRUE(bit_vector1[1] == false);
+	ASSERT_TRUE(bit_vector1[2] == true);
+	push_n_check(bit_vector1, 350);
+}
+
+#define LENGTH3 250
+TEST(BitVector, Set_Clear_Reserve) {
+	size_t size;
+	BitVector bit_vector1;
+	ASSERT_TRUE(bit_vector1.size() == 0);
+	bit_vector1.resize(LENGTH3);
+	ASSERT_TRUE(bit_vector1.size() == LENGTH3);
+	for (size_t i = 0; i < LENGTH3; i++) {
+		ASSERT_FALSE(bit_vector1[i]);
+		bit_vector1.set_bit(i);
+		ASSERT_TRUE(bit_vector1[i]);
+		bit_vector1.clear_bit(i);
+		ASSERT_FALSE(bit_vector1[i]);
 	}
 }
 
