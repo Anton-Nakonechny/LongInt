@@ -6,9 +6,9 @@ using namespace std;
 bool Digits::divide2()
 {
 	bool carry = false;
-	for (vector<unsigned short>::iterator iter = this->begin(); iter < this->end(); iter++) {
-		unsigned char cur_dig = *iter + carry * 10;
-		*iter = cur_dig / 2;
+	for (size_t index = 0; index < count; index++) {
+		unsigned char cur_dig = (*this)[index] + carry * 10;
+		(*this)[index] = cur_dig / 2;
 		carry = cur_dig % 2;
 	}
 	return carry;
@@ -17,34 +17,43 @@ bool Digits::divide2()
 void Digits::mul2()
 {
 	bool carry = false;
-	for (vector<unsigned short>::iterator iter = this->begin(); iter < this->end(); iter++) {
-		unsigned char cur_dig = *iter * 2  + carry;
-		*iter = cur_dig % 10;
+	for (size_t index = 0; index < count; index++) {
+		unsigned char cur_dig = (*this)[index] * 2  + carry;
+		(*this)[index] = cur_dig % 10;
 		carry = cur_dig / 10;
 	}
 	if (carry)
 		this->push_back(1);
 }
 
+bool Digits::non_zero()
+{
+	if (count == 0)
+		return false;
+	for (size_t i = this->size() - 1; i > 0; i--)
+		if ((*this)[i] > 0)
+			return true;
+	return (*this)[0] != 0;
+}
+
 Digits &Digits::operator+=(const Digits &rhs)
 {
-	if (this->size() < rhs.size())
-		this->resize(rhs.size());
-	vector<unsigned short>::iterator lhs_iter = this->begin();
+	size_t rhs_size = rhs.size();
+	size_t i;
+	if (count < rhs_size)
+		this->resize(rhs_size);
 	bool carry = false;
-	for (vector<unsigned short>::const_iterator rhs_iter = rhs.begin();
-				rhs_iter < rhs.end();
-				rhs_iter++, lhs_iter++) {
-		unsigned char tmp = *lhs_iter + *rhs_iter + carry;
-		*lhs_iter = tmp % 10;
+	for (i = 0; i < rhs_size; i++) {
+		unsigned char tmp = (*this)[i] + rhs[i] + carry;
+		(*this)[i] = tmp % 10;
 		carry = tmp / 10;
 	}
+
 	while (carry) {
-		if (lhs_iter < this->end()) {
-			unsigned char tmp = *lhs_iter + carry;
-			*lhs_iter = tmp % 10;
+		if (i < count) {
+			unsigned char tmp = (*this)[i] + carry;
+			(*this)[i] = tmp % 10;
 			carry = tmp / 10;
-			lhs_iter+=1;
 		} else {
 			this->push_back(1);
 			return *this;
@@ -54,10 +63,12 @@ Digits &Digits::operator+=(const Digits &rhs)
 }
 
 Digits::Digits(size_t num, unsigned char val):
-		std::vector<unsigned short>(num, val) {}
+		Vector(num, val) {}
 
 ostream& operator<<(ostream& os, const Digits& digits)
 {
-	copy(digits.rbegin(), digits.rend(), ostream_iterator<unsigned short>(os));
+	for (size_t index = digits.size() - 1; index > 0; index--)
+		os<<static_cast<unsigned short>(digits[index]);
+	os<<static_cast<unsigned short>(digits[0]);
 	return os;
 }

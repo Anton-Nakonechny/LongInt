@@ -2,7 +2,7 @@ all:test
 
 .PHONY : clean
 
-OBJECTS = LongInt.o Digits.o
+OBJECTS = LongInt.o Digits.o Vector.o
 
 ${OBJECTS}:%.o: %.cpp %.hpp
 	g++ $< -o $@ -c -g3 -O0

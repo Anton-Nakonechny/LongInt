@@ -46,22 +46,19 @@ unsigned short LongInt::char2dec(char digit)
 	if (difference >= 0 && difference < 10)
 		return difference;
 	else
-		throw invalid_argument(&digit);
+		throw invalid_argument("");
 }
 
 void LongInt::create_from_decimal_str(string &str)
 {
 	Digits digits(str.length(), 0);
 	bool carry = false;
-	transform(str.begin(), str.end(), digits.begin(), char2dec);
+	size_t index = 0;
+	for (string::iterator iter = str.begin(); iter < str.end(); iter++, index++)
+		digits[index] = char2dec(*iter);
 	this->reserve((digits.size() * 10 + 3) / 3);
-	while (find_if(
-			digits.rbegin(),
-			digits.rend(),
-			bind1st(not_equal_to<unsigned short>(), 0)) <
-						digits.rend()) {
+	while (digits.non_zero())
 		this->push_back(digits.divide2());
-	}
 }
 
 void LongInt::push_most_significant_hex(char digit)

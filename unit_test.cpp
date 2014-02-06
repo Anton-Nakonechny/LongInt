@@ -4,6 +4,36 @@
 #include "LongInt.hpp"
 #include "Vector.hpp"
 
+
+#define LENGTH1 20
+#define VAL1 0xFF
+TEST(Vector, Construct) {
+	size_t size;
+	Vector vector(LENGTH1, VAL1);
+	ASSERT_TRUE(vector.size() == LENGTH1);
+	for (size_t i = 0; i < LENGTH1; i++) {
+		ASSERT_TRUE(vector[i] == VAL1);
+	}
+}
+
+#define LENGTH2 50
+#define VAL2 0xFA
+#define ADDITIONAL_LENGTH 11
+TEST(Vector, Enlarge) {
+	Vector vector(LENGTH2, VAL2);
+	ASSERT_TRUE(vector.size() == LENGTH2);
+	vector.resize(LENGTH2 - 5);
+	ASSERT_TRUE(vector.size() == LENGTH2);
+	vector.resize(LENGTH2 + ADDITIONAL_LENGTH);
+	ASSERT_TRUE(vector.size() == LENGTH2 + ADDITIONAL_LENGTH);
+	for (size_t i = 0; i < LENGTH2; i++) {
+		ASSERT_TRUE(vector[i] == VAL2);
+	}
+	for (size_t i = LENGTH2; i < LENGTH2 + ADDITIONAL_LENGTH; i++) {
+		ASSERT_TRUE(vector[i] == 0);
+	}
+}
+
 TEST(LongInt, Consturct) {
 	std::string number1("13ojp4f12");
 	ASSERT_THROW(LongInt long_int(number1), std::invalid_argument);
@@ -27,7 +57,6 @@ TEST(LongInt, CreateNDump) {
 	std::string str1("134372423648234128739264519341648163294462384");
 	LongInt number1(str1);
 	std::stringstream ss;
-
 	ss<<number1;
 	ASSERT_TRUE(ss.str() == str1);
 }
