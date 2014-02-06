@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <string.h>
 #include "Vector.hpp"
 
 Vector::Vector(size_t count, unsigned char value):
@@ -10,6 +11,32 @@ Vector::Vector(size_t count, unsigned char value):
 	for (size_t i = 0; i < count; i++)
 		storage[i] = value;
 }
+
+Vector::Vector(const Vector &vec)
+{
+	void *new_container = malloc(vec.capacity * sizeof(unsigned char));
+	if (new_container == NULL)
+		throw std::bad_alloc();
+	memcpy(new_container, vec.storage, vec.capacity * sizeof(unsigned char));
+	storage = static_cast<unsigned char *>(new_container);
+	capacity = vec.capacity;
+	count = vec.count;
+}
+
+Vector &Vector::operator=(const Vector &vec)
+{
+	Vector tmp(vec);
+	swap(tmp);
+	return *this;
+}
+
+void Vector::swap(Vector &vec)
+{
+	std::swap(this->storage, vec.storage);
+	std::swap(this->capacity, vec.capacity);
+	std::swap(this->count, vec.count);
+}
+
 
 unsigned char &Vector::operator[](size_t index)
 {
@@ -64,7 +91,7 @@ void Vector::push_back(unsigned char what)
 
 void Vector::resize(size_t size)
 {
-	//only increasing count
+	/* only increasing count */
 	size_t old_size = count;
 	if (size <= count)
 		return;

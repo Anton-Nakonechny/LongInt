@@ -1,8 +1,6 @@
 #include <iterator>
 #include "Digits.hpp"
 
-using namespace std;
-
 bool Digits::divide2()
 {
 	bool carry = false;
@@ -65,7 +63,7 @@ Digits &Digits::operator+=(const Digits &rhs)
 Digits::Digits(size_t num, unsigned char val):
 		Vector(num, val) {}
 
-ostream& operator<<(ostream& os, const Digits& digits)
+std::ostream& operator<<(std::ostream& os, const Digits& digits)
 {
 	for (size_t index = digits.size() - 1; index > 0; index--)
 		os<<static_cast<unsigned short>(digits[index]);

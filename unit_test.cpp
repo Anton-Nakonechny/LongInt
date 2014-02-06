@@ -42,7 +42,7 @@ TEST(Vector, Enlarge) {
 void push_n_check(BitVector &bv, size_t count)
 {
 	for (size_t i = 0; i < count; i++) {
-		bool val = i * 3 % 2;
+		bool val = (i * 3) % 2;
 		bv.push_back(val);
 		ASSERT_TRUE(bv[bv.size() - 1] == val);
 	}
@@ -78,7 +78,37 @@ TEST(BitVector, Set_Clear_Reserve) {
 	}
 }
 
-TEST(LongInt, Consturct) {
+#define SIZE 50
+#define NUM 15
+#define START 40
+
+TEST(BitVector, Shift) {
+	BitVector bit_vector1;
+	for (size_t i = 0; i < SIZE; i++)
+		bit_vector1.push_back((i * 3) % 2);
+
+	bit_vector1.shift_right(START, NUM);
+	for (size_t i = START; i < START + NUM; i++)
+		ASSERT_FALSE(bit_vector1[i]);
+	for (size_t i = START, j = START + NUM; j < SIZE + NUM; i++, j++)
+		ASSERT_TRUE(bit_vector1[j] == (i * 3) % 2);
+}
+
+#define RESERVED_SIZE 25
+#define ASSIGNED_SIZE 5
+
+TEST(BitVector, Shrink) {
+	BitVector bit_vector1;
+	bit_vector1.resize(RESERVED_SIZE);
+	ASSERT_TRUE(bit_vector1.reserved_size() <= RESERVED_SIZE + BitVector::BITS_PER_BYTE);
+	for (size_t i = 0; i < ASSIGNED_SIZE; i++)
+		if ((i + 1) % 2)
+			bit_vector1.set_bit(i);
+	bit_vector1.remove_leading_zeroes();
+	ASSERT_TRUE(bit_vector1.size() == ASSIGNED_SIZE);
+}
+
+TEST(LongInt, Construct) {
 	std::string number1("13ojp4f12");
 	ASSERT_THROW(LongInt long_int(number1), std::invalid_argument);
 	number1 = "0x098dcadcCDA23e4462384";
@@ -100,9 +130,11 @@ TEST(LongInt, Consturct) {
 TEST(LongInt, CreateNDump) {
 	std::string str1("134372423648234128739264519341648163294462384");
 	LongInt number1(str1);
-	std::stringstream ss;
-	ss<<number1;
-	ASSERT_TRUE(ss.str() == str1);
+	LongInt number2(number1);
+	std::stringstream ss1, ss2;
+	ss1 << number1; ss2 << number2;
+	ASSERT_TRUE(ss1.str() == str1);
+	ASSERT_TRUE(ss1.str() == ss2.str());
 }
 
 TEST(LongInt, Plus) {
@@ -124,6 +156,9 @@ TEST(LongInt, Multiply) {
 	ss.clear();	ss.str("");
 	ss<<LongInt("15") * LongInt("18");
 	ASSERT_TRUE(ss.str() == "270");
+	ss.clear();	ss.str("");
+	ss<<LongInt("8192") * LongInt("0xA7");
+	ASSERT_TRUE(ss.str() == "1368064");
 	ss.clear();	ss.str("");
 	ss<<LongInt("0x574a10123") * LongInt("0x1234DB14AF2");
 	ASSERT_TRUE(ss.str() == "29316118711127661752598");

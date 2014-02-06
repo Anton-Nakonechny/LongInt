@@ -7,9 +7,7 @@
 #include "LongInt.hpp"
 #include "Digits.hpp"
 
-using namespace std;
-
-ostream& operator<<(ostream& os, const LongInt& long_int)
+std::ostream& operator<<(std::ostream& os, const LongInt& long_int)
 {
 	unsigned short num_digits = long_int.size() * 3 / 10;
 	Digits digits(num_digits, 0);
@@ -25,43 +23,37 @@ ostream& operator<<(ostream& os, const LongInt& long_int)
 	return os;
 }
 
-LongInt &LongInt::operator=(const LongInt &rhs)
-{
-	*this = rhs;
-	return *this;
-}
-
 std::istream& operator>>(std::istream& is, LongInt &obj)
 {
-  string str;
+  std::string str;
   is >> str;
   LongInt long_int(str);
   obj = long_int;
   return is;
 }
 
-unsigned short LongInt::char2dec(char digit)
+unsigned short LongInt::char2dec(const char digit)
 {
 	char difference = digit - '0';
 	if (difference >= 0 && difference < 10)
 		return difference;
 	else
-		throw invalid_argument("");
+		throw std::invalid_argument("");
 }
 
-void LongInt::create_from_decimal_str(string &str)
+void LongInt::create_from_decimal_str(const std::string &str)
 {
 	Digits digits(str.length(), 0);
 	bool carry = false;
 	size_t index = 0;
-	for (string::iterator iter = str.begin(); iter < str.end(); iter++, index++)
+	for (std::string::const_iterator iter = str.begin(); iter < str.end(); iter++, index++)
 		digits[index] = char2dec(*iter);
 	this->reserve((digits.size() * 10 + 3) / 3);
 	while (digits.non_zero())
 		this->push_back(digits.divide2());
 }
 
-void LongInt::push_most_significant_hex(char digit)
+void LongInt::push_most_significant_hex(const char digit)
 {
 	switch (digit) {
 	case '0':
@@ -118,11 +110,11 @@ void LongInt::push_most_significant_hex(char digit)
 		this->push_back(1); this->push_back(1); this->push_back(1); this->push_back(1);
 	break;
 	default:
-		throw invalid_argument(string(1, digit));
+		throw std::invalid_argument(std::string(1, digit));
 	}
 }
 
-void LongInt::push_hex2bin(char digit)
+void LongInt::push_hex2bin(const char digit)
 {
 	switch (digit) {
 	case '0':
@@ -180,35 +172,38 @@ void LongInt::push_hex2bin(char digit)
 		this->push_back(1); this->push_back(1); this->push_back(1); this->push_back(1);
 	break;
 	default:
-		throw invalid_argument(string(1, digit));
+		throw std::invalid_argument(std::string(1, digit));
 	}
 }
 
-void LongInt::create_from_hex_str(string &str)
+void LongInt::create_from_hex_str(const std::string &str)
 {
 	this->reserve((str.size() - 2) * 4);
-	for (string::reverse_iterator iter = str.rbegin(); iter < str.rend() - 3; iter++)
+	for (std::string::const_reverse_iterator iter = str.rbegin(); iter < str.rend() - 3; iter++)
 		push_hex2bin(*iter);
 	push_most_significant_hex(*(str.rend() - 3));
 }
 
-void LongInt::create_from_string(string &str)
+void LongInt::create_from_string(const std::string &str)
 {
 	if(!str.compare(0, 2, "0x", 2) || !str.compare(0, 2, "0X", 2)){
 		create_from_hex_str(str);
 	} else {
 		create_from_decimal_str(str);
 	}
+	/* reserved maximum possible needed memory
+	 * shrink leading zeroes now */
+	remove_leading_zeroes();
 }
 
-LongInt::LongInt(string &str)
+LongInt::LongInt(const std::string &str)
 {
 	create_from_string(str);
 }
 
 LongInt::LongInt(const char *str)
 {
-	string param(str);
+	std::string param(str);
 	create_from_string(param);
 }
 
@@ -223,18 +218,21 @@ LongInt &LongInt::operator+=(const LongInt &rhs)
 	{
 		if ((*this)[index] && rhs[index]) {
 			if (carry)
-				(*this)[index] = 1;
+				this->set_bit(index);
 			else
-				(*this)[index] = 0;
+				this->clear_bit(index);
 			carry = 1;
 		} else if (!((*this)[index] || rhs[index])) {
 			if (carry)
-				(*this)[index] = 1;
+				this->set_bit(index);
 			else
-				(*this)[index] = 0;
+				this->clear_bit(index);
 			carry = 0;
 		} else {
-			(*this)[index] = !carry;
+			if (carry)
+				this->clear_bit(index);
+			else
+				this->set_bit(index);
 			carry = !(*this)[index];
 		}
 	}
@@ -243,9 +241,13 @@ LongInt &LongInt::operator+=(const LongInt &rhs)
 	while (carry)
 		if (index < num_bits) {
 			carry = (*this)[index];
-			(*this)[index] = !(*this)[index];
+			if(carry)
+				clear_bit(index);
+			else
+				set_bit(index);
+			index++;
 		} else {
-			this->push_back(1);
+			push_back(1);
 			return *this;
 		}
 	return *this;
@@ -256,7 +258,7 @@ LongInt &operator+(LongInt op1, const LongInt &op2)
 	return op1+=op2;
 }
 
-void LongInt::dump(ostream& os)
+void LongInt::dump(std::ostream& os)
 {
 	for (int i = this->size() - 1; i >= 0; i--)
 		os << (*this)[i];
@@ -266,15 +268,18 @@ LongInt &LongInt::operator*=(const LongInt &rhs)
 {
 	LongInt lhs(*this);
 	size_t rhs_num_bits = rhs.size(), lhs_num_bits = lhs.size();
-	lhs.resize(lhs_num_bits + rhs_num_bits);
+	lhs.reserve(lhs_num_bits + rhs_num_bits);
 	this->clear();
-	for (size_t index = 0; index < rhs_num_bits; index++) {
-		if (rhs[index])
+	size_t last_position = 0;
+	if (rhs[0])
+		*this += lhs;
+
+	for (size_t index = 1; index < rhs_num_bits; index++)
+		if (rhs[index]) {
+			lhs.shift_right(last_position, index - last_position);
 			*this += lhs;
-		for (int i = lhs_num_bits + index - 1; i >= 0; i--)
-			lhs[i+1] = lhs[i];
-		lhs[index] = 0;
-	}
+			last_position = index;
+		}
 	return *this;
 }
 
