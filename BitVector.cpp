@@ -43,7 +43,7 @@ void BitVector::remove_leading_zeroes()
 		bit_count = 0;
 	else {
 			unsigned char num_bits = 0;
-			unsigned char most_significant_byte = storage[i];
+			unsigned int most_significant_byte = storage[i];
 			while (most_significant_byte) {
 				most_significant_byte >>= 1;
 				num_bits++;
@@ -75,6 +75,9 @@ void BitVector::shift_right(const size_t start, const size_t num_positions)
 	size_t cur_size = bit_count;
 	size_t first_byte = (start + BITS_PER_BYTE - 1) / BITS_PER_BYTE;
 	size_t last_byte = cur_size / BITS_PER_BYTE;
+
+	if (start >= bit_count)
+		return;
 
 	resize(bit_count + num_positions);
 

@@ -12,7 +12,7 @@
 
 class Vector {
 	static const size_t DEFAULT_CAPACITY = 150;
-	unsigned char *storage;
+	unsigned int *storage;
 
 protected:
 	size_t count;
@@ -22,16 +22,16 @@ protected:
 public:
 	Vector():
 		count(0), capacity(0), storage(NULL) {}
-	Vector(size_t count, unsigned char value);
+	Vector(size_t count, unsigned int value);
 	Vector(const Vector &vec);
 	~Vector();
 	Vector &operator=(const Vector &);
-	unsigned char &operator[](size_t index);
-	const unsigned char &operator[](size_t index) const;
+	unsigned int &operator[](size_t index);
+	const unsigned int &operator[](size_t index) const;
 	size_t size() const { return this->count; }
 	size_t reserved_size() const { return this->capacity; }
 	void resize(size_t size);
-	void push_back(unsigned char);
+	void push_back(unsigned int);
 	void reserve(size_t size);
 	void grow();
 	void swap(Vector &);

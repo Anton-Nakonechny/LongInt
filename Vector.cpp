@@ -2,10 +2,10 @@
 #include <string.h>
 #include "Vector.hpp"
 
-Vector::Vector(size_t count, unsigned char value):
+Vector::Vector(size_t count, unsigned int value):
 	count(count), capacity(count), storage(NULL)
 {
-	storage = static_cast<unsigned char *>(malloc(count * sizeof(unsigned char)));
+	storage = static_cast<unsigned int *>(malloc(count * sizeof(unsigned int)));
 	if (storage == NULL)
 		throw std::bad_alloc();
 	for (size_t i = 0; i < count; i++)
@@ -14,11 +14,11 @@ Vector::Vector(size_t count, unsigned char value):
 
 Vector::Vector(const Vector &vec)
 {
-	void *new_container = malloc(vec.capacity * sizeof(unsigned char));
+	void *new_container = malloc(vec.capacity * sizeof(unsigned int));
 	if (new_container == NULL)
 		throw std::bad_alloc();
-	memcpy(new_container, vec.storage, vec.capacity * sizeof(unsigned char));
-	storage = static_cast<unsigned char *>(new_container);
+	memcpy(new_container, vec.storage, vec.capacity * sizeof(unsigned int));
+	storage = static_cast<unsigned int *>(new_container);
 	capacity = vec.capacity;
 	count = vec.count;
 }
@@ -38,14 +38,14 @@ void Vector::swap(Vector &vec)
 }
 
 
-unsigned char &Vector::operator[](size_t index)
+unsigned int &Vector::operator[](size_t index)
 {
 	if (index >= count)
 		throw std::out_of_range("");
 	return storage[index];
 }
 
-const unsigned char &Vector::operator[](size_t index) const
+const unsigned int &Vector::operator[](size_t index) const
 {
 	if (index >= count)
 		throw std::out_of_range("");
@@ -54,16 +54,16 @@ const unsigned char &Vector::operator[](size_t index) const
 
 void Vector::reserve(size_t size)
 {
-	unsigned char *new_storage;
+	unsigned int *new_storage;
 	if (size <= capacity)
 		return;
 
 	if (storage != NULL)
-		new_storage = static_cast<unsigned char *>(
-				realloc(storage, size * sizeof(unsigned char)));
+		new_storage = static_cast<unsigned int *>(
+				realloc(storage, size * sizeof(unsigned int)));
 	else
-		new_storage = static_cast<unsigned char *>(
-				malloc( size * sizeof(unsigned char)));
+		new_storage = static_cast<unsigned int *>(
+				malloc( size * sizeof(unsigned int)));
 
 	if (new_storage == NULL)
 		throw std::bad_alloc();
@@ -82,7 +82,7 @@ void Vector::grow()
 	reserve(new_capacity);
 }
 
-void Vector::push_back(unsigned char what)
+void Vector::push_back(unsigned int what)
 {
 	if (capacity == count)
 		grow();

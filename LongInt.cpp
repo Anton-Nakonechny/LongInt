@@ -48,9 +48,9 @@ void LongInt::create_from_decimal_str(const std::string &str)
 	size_t index = 0;
 	for (std::string::const_iterator iter = str.begin(); iter < str.end(); iter++, index++)
 		digits[index] = char2dec(*iter);
-	this->reserve((digits.size() * 10 + 3) / 3);
+	reserve((digits.size() * 10 + 3) / 3);
 	while (digits.non_zero())
-		this->push_back(digits.divide2());
+		push_back(digits.divide2());
 }
 
 void LongInt::push_most_significant_hex(const char digit)

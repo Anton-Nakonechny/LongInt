@@ -1,4 +1,4 @@
-all:test
+all:test main
 
 .PHONY : clean
 

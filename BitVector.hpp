@@ -7,7 +7,7 @@ class BitVector{
 	size_t bit_count;
 	Vector storage;
 public:
-	static const unsigned char BITS_PER_BYTE = 8;
+	static const unsigned char BITS_PER_BYTE = 32;
 	BitVector():bit_count(0) {}
 	BitVector(const BitVector &bv);
 	size_t size() const { return bit_count; }
