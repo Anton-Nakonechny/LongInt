@@ -8,13 +8,13 @@
 #define LENGTH1 20
 #define VAL1 0xFF
 TEST(Vector, Construct) {
-	Vector vector1;
+	Vector<unsigned char> vector1;
 	ASSERT_TRUE(vector1.size() == 0);
 	vector1.push_back(VAL1);
 	ASSERT_TRUE(vector1[0] == VAL1);
 	ASSERT_THROW(vector1[1], std::out_of_range);
 
-	Vector vector2(LENGTH1, VAL1);
+	Vector<unsigned int> vector2(LENGTH1, VAL1);
 	ASSERT_TRUE(vector2.size() == LENGTH1);
 	for (size_t i = 0; i < LENGTH1; i++) {
 		ASSERT_TRUE(vector2[i] == VAL1);
@@ -25,7 +25,7 @@ TEST(Vector, Construct) {
 #define VAL2 0xFA
 #define ADDITIONAL_LENGTH 11
 TEST(Vector, Enlarge) {
-	Vector vector(LENGTH2, VAL2);
+	Vector<unsigned char> vector(LENGTH2, VAL2);
 	ASSERT_TRUE(vector.size() == LENGTH2);
 	vector.resize(LENGTH2 - 5);
 	ASSERT_TRUE(vector.size() == LENGTH2);
@@ -39,7 +39,7 @@ TEST(Vector, Enlarge) {
 	}
 }
 
-void push_n_check(BitVector &bv, size_t count)
+void push_n_check(BitVector<char> &bv, size_t count)
 {
 	for (size_t i = 0; i < count; i++) {
 		bool val = (i * 3) % 2;
@@ -50,7 +50,7 @@ void push_n_check(BitVector &bv, size_t count)
 
 TEST(BitVector, Construct_Push_Back) {
 	size_t size;
-	BitVector bit_vector1;
+	BitVector<char> bit_vector1;
 	ASSERT_TRUE(bit_vector1.size() == 0);
 	bit_vector1.push_back(true);
 	ASSERT_TRUE(bit_vector1[0] == true);
@@ -65,7 +65,7 @@ TEST(BitVector, Construct_Push_Back) {
 #define LENGTH3 250
 TEST(BitVector, Set_Clear_Reserve) {
 	size_t size;
-	BitVector bit_vector1;
+	BitVector<int> bit_vector1;
 	ASSERT_TRUE(bit_vector1.size() == 0);
 	bit_vector1.resize(LENGTH3);
 	ASSERT_TRUE(bit_vector1.size() == LENGTH3);
@@ -83,7 +83,7 @@ TEST(BitVector, Set_Clear_Reserve) {
 #define START 40
 
 TEST(BitVector, Shift) {
-	BitVector bit_vector1;
+	BitVector<short> bit_vector1;
 	for (size_t i = 0; i < SIZE; i++)
 		bit_vector1.push_back((i * 3) % 2);
 
@@ -98,9 +98,9 @@ TEST(BitVector, Shift) {
 #define ASSIGNED_SIZE 5
 
 TEST(BitVector, Shrink) {
-	BitVector bit_vector1;
+	BitVector<int> bit_vector1;
 	bit_vector1.resize(RESERVED_SIZE);
-	ASSERT_TRUE(bit_vector1.reserved_size() <= RESERVED_SIZE + BitVector::BITS_PER_BYTE);
+	ASSERT_TRUE(bit_vector1.reserved_size() <= RESERVED_SIZE + BitVector<int>::BITS_PER_TYPE);
 	for (size_t i = 0; i < ASSIGNED_SIZE; i++)
 		if ((i + 1) % 2)
 			bit_vector1.set_bit(i);

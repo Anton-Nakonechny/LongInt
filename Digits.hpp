@@ -6,7 +6,7 @@
 
 /* digits are stored in parent container class in reverse order
  * form least significant to most significant*/
-class Digits : public Vector {
+class Digits : public Vector<unsigned char> {
 
 public:
 	Digits(size_t num, unsigned char val);

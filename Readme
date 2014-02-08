@@ -1,0 +1,13 @@
+Class LongInt used to operate with Long integer numbers.
+Bits are stored in least significant order.
+
+class Digits is used for input/output purposes.
+It is a simple inefficient (in terms of memory consumption) vector.
+One byte is used per digit.
+Digits are stored in vector in reverse order too,
+this way lots of memory reallocations avoided during bin->dec and dec->bin convertion.
+
+Make will compile simple unit tests
+Google unit test framework is used.
+Pretty short ubuntu instalation guide for test framework is on the web:
+http://www.thebigblob.com/getting-started-with-google-test-on-ubuntu/

@@ -9,7 +9,7 @@ struct	bad_num{};
 
 /* bits are stored in parent container class in reverse order
  * form least significant to most significant*/
-class LongInt : public BitVector {
+class LongInt : public BitVector<unsigned char> {
 
 	/* converts character to corresponding numeric value */
 	static unsigned short char2dec(const char digit);
