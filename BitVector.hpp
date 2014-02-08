@@ -19,11 +19,22 @@ public:
 	void set_bit(size_t index);
 	void clear_bit(size_t index);
 	void clear() { storage.clear(); };
+	/* shifts bitvector to the right
+	 * since number is stored in reverse order
+	 * shifts in most significant bit direction
+	 * i.e. multiply number by a power of 2*/
 	void shift_right(size_t start, size_t num_bits);
 	void remove_leading_zeroes();
+	void swap(BitVector<T> &bit_vector);
 };
 
 template<typename T> BitVector<T>::BitVector():bit_count(0) {}
+
+template<typename T> void BitVector<T>::swap(BitVector<T> &bit_vector)
+{
+	storage.swap(bit_vector.storage);
+	std::swap(bit_count, bit_vector.bit_count);
+}
 
 
 template<typename T> BitVector<T>::BitVector(const BitVector<T> &bv)

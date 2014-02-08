@@ -266,20 +266,28 @@ void LongInt::dump(std::ostream& os)
 
 LongInt &LongInt::operator*=(const LongInt &rhs)
 {
-	LongInt lhs(*this);
-	size_t rhs_num_bits = rhs.size(), lhs_num_bits = lhs.size();
-	lhs.reserve(lhs_num_bits + rhs_num_bits);
-	this->clear();
+	bool change_order = size() < rhs.size();
+	const LongInt &multiplied = change_order ? rhs : *this;
+	const LongInt &multiplier = change_order ? *this : rhs;
+
+	LongInt lhs(multiplied), acc;
+	size_t rhs_num_bits = multiplier.size();
+
+/* reserve to maximum product length at start to avoid reallocations later*/
+	lhs.reserve(lhs.size() + rhs_num_bits);
+
+/* how many positions lhs is shifted to the right */
 	size_t last_position = 0;
-	if (rhs[0])
-		*this += lhs;
+	if (multiplier[0])
+		acc += lhs;
 
 	for (size_t index = 1; index < rhs_num_bits; index++)
-		if (rhs[index]) {
+		if (multiplier[index]) {
 			lhs.shift_right(last_position, index - last_position);
-			*this += lhs;
+			acc += lhs;
 			last_position = index;
 		}
+	swap(acc);
 	return *this;
 }
 
