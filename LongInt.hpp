@@ -9,7 +9,7 @@ struct	bad_num{};
 
 /* bits are stored in parent container class in reverse order
  * form least significant to most significant*/
-class LongInt : public BitVector<unsigned char> {
+class LongInt : public BitVector<unsigned int> {
 
 	/* converts character to corresponding numeric value */
 	static unsigned short char2dec(const char digit);
@@ -33,10 +33,10 @@ public:
 
 	/* behaves as >>operator but dumps in binary form */
 	void dump(std::ostream& os);
+	bool is_zero() const { return bit_count == 0; }
 
 	LongInt(const std::string &str);
 	LongInt(const char *str);
-	LongInt(){}
 	friend bool operator< (const LongInt &lhs, const LongInt &rhs);
 	friend bool operator>=(const LongInt &lhs, const LongInt &rhs);
 	friend bool operator>(const LongInt &lhs, const LongInt &rhs);

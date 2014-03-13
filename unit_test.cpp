@@ -139,10 +139,37 @@ TEST(LongInt, CreateNDump) {
 
 TEST(LongInt, Plus) {
 	std::stringstream ss1, ss2;
-	LongInt long_int("1542");
-	long_int+=LongInt("15");
 	ss1<<LongInt("0xAC685DE30B1782") + LongInt("0xFE84CB243163E97C4D512");
 	ASSERT_TRUE(ss1.str() == "19230891164458265961557140");
+
+	ss1.clear(); ss1.str("");
+	LongInt long_int2("126");
+	long_int2 += LongInt("144");
+	ss1<<long_int2;
+	ASSERT_TRUE(ss1.str() == "270");
+
+	ss1.clear(); ss1.str("");
+	ss1<<LongInt("0xFD") + LongInt("0xFF");
+	ASSERT_TRUE(ss1.str() == "508");
+
+	ss1.clear(); ss1.str("");
+	ss1<<LongInt("0x1FE") + LongInt("0x3FC");
+	ASSERT_TRUE(ss1.str() == "1530");
+
+	ss1.clear(); ss1.str("");
+	ss1<<LongInt("63552") + LongInt("1986");
+	ASSERT_TRUE(ss1.str() == "65538");
+
+	ss1.clear(); ss1.str("");
+	ss1<<LongInt("0xFFFFEF") + LongInt("25");
+	ASSERT_TRUE(ss1.str() == "16777224");
+
+	ss1.clear(); ss1.str("");
+	ss1<<LongInt("0x1234db14af2") + LongInt("0x2469B6295E4");
+	ASSERT_TRUE(ss1.str() == "3753416843478");
+
+	LongInt long_int("1542");
+	long_int += LongInt("15");
 	ss2<<long_int;
 	ASSERT_TRUE(ss2.str() == "1557");
 }
@@ -162,6 +189,9 @@ TEST(LongInt, Multiply) {
 	ss.clear();	ss.str("");
 	ss<<LongInt("0x574a10123") * LongInt("0x1234DB14AF2");
 	ASSERT_TRUE(ss.str() == "29316118711127661752598");
+	ss.clear();	ss.str("");
+	ss<<LongInt("0xFF") * LongInt("0xFE");
+	ASSERT_TRUE(ss.str() == "64770");
 	ss.clear();	ss.str("");
 	ss<<LongInt("0xAC685DE30B1782") * LongInt("0xFE84CB243163E97C4D51");
 	ASSERT_TRUE(ss.str() == "58327831753986849041238136227011847031330");

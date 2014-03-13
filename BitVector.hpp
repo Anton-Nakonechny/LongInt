@@ -3,11 +3,17 @@
 
 #include "Vector.hpp"
 
+/*TODO would work incorrectly with signed container type
+ *should fail in compile time in this case
+ *enable_if is to be used
+ */
 template<typename T = unsigned int> class BitVector{
+protected:
 	size_t bit_count;
 	Vector<T> storage;
 public:
-	static const unsigned char BITS_PER_TYPE = sizeof(T) * 8 / sizeof(char);
+	static const unsigned char BITS_PER_TYPE;
+	static const T MAX_CONTAINER_ITEM_VALUE;
 	BitVector();
 	BitVector(const BitVector<T> &bv);
 	size_t size() const { return bit_count; }
@@ -18,7 +24,7 @@ public:
 	void resize(size_t size);
 	void set_bit(size_t index);
 	void clear_bit(size_t index);
-	void clear() { storage.clear(); };
+	void clear() { storage.clear(); bit_count = 0;}
 	/* shifts bitvector to the right
 	 * since number is stored in reverse order
 	 * shifts in most significant bit direction
@@ -27,6 +33,12 @@ public:
 	void remove_leading_zeroes();
 	void swap(BitVector<T> &bit_vector);
 };
+
+template<typename T> const unsigned char BitVector<T>::BITS_PER_TYPE =
+		sizeof(T) * 8 / sizeof(char);
+
+template<typename T> const T BitVector<T>::MAX_CONTAINER_ITEM_VALUE =
+		static_cast<T>(-1);
 
 template<typename T> BitVector<T>::BitVector():bit_count(0) {}
 
@@ -70,22 +82,22 @@ template<typename T> void BitVector<T>::reserve(size_t size)
 
 template<typename T> void BitVector<T>::remove_leading_zeroes()
 {
-	size_t i;
-	for (i = storage.size() - 1; i > 0; i--)
+	size_t i, storage_size = storage.size();
+
+	if (storage_size == 0)
+		return;
+
+	for (i = storage_size - 1; i > 0; i--)
 		if (storage[i] != 0)
 			break;
 
-	if (storage[i] == 0)
-		bit_count = 0;
-	else {
-			unsigned char num_bits = 0;
-			unsigned int most_significant_byte = storage[i];
-			while (most_significant_byte) {
-				most_significant_byte >>= 1;
-				num_bits++;
-			}
-			bit_count = i * BITS_PER_TYPE + num_bits;
-		}
+	unsigned char num_bits = 0;
+	T most_significant_byte = storage[i];
+	while (most_significant_byte) {
+		most_significant_byte >>= 1;
+		num_bits++;
+	}
+	bit_count = i * BITS_PER_TYPE + num_bits;
 }
 
 template<typename T> void BitVector<T>::resize(size_t size)
@@ -109,8 +121,9 @@ template<typename T> void BitVector<T>::set_bit(size_t index)
 template<typename T> void BitVector<T>::shift_right(const size_t start, const size_t num_positions)
 {
 	size_t cur_size = bit_count;
-	size_t first_byte = (start + BITS_PER_TYPE - 1) / BITS_PER_TYPE;
 	size_t last_byte = cur_size / BITS_PER_TYPE;
+	int first_byte = (start + BITS_PER_TYPE - 1) / BITS_PER_TYPE;
+	/* need to compare with -1, must be signed */
 
 	if (start >= bit_count)
 		return;
@@ -120,7 +133,7 @@ template<typename T> void BitVector<T>::shift_right(const size_t start, const si
 	/* Move by byte if possible */
 	if (num_positions % BITS_PER_TYPE == 0) {
 		size_t num_bytes = num_positions / BITS_PER_TYPE;
-		for (size_t i = cur_size; i >= last_byte * BITS_PER_TYPE; i--)
+		for (size_t i = cur_size - 1; i >= last_byte * BITS_PER_TYPE; i--)
 			if((*this)[i])
 				set_bit(i + num_positions);
 			else

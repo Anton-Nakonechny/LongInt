@@ -9,7 +9,7 @@
 
 std::ostream& operator<<(std::ostream& os, const LongInt& long_int)
 {
-	unsigned short num_digits = long_int.size() * 3 / 10;
+	size_t num_digits = long_int.size() * 3 / 10;
 	Digits digits(num_digits, 0);
 	Digits pow2(1, 1);
 	pow2.reserve(num_digits);
@@ -52,7 +52,7 @@ void LongInt::create_from_decimal_str(const std::string &str)
 	while (digits.non_zero())
 		push_back(digits.divide2());
 }
-
+/* TODO to be replaced with bytewise assignment*/
 void LongInt::push_most_significant_hex(const char digit)
 {
 	switch (digit) {
@@ -201,7 +201,7 @@ LongInt::LongInt(const std::string &str)
 	create_from_string(str);
 }
 
-LongInt::LongInt(const char *str)
+LongInt::LongInt(const char *str = "0")
 {
 	std::string param(str);
 	create_from_string(param);
@@ -209,47 +209,45 @@ LongInt::LongInt(const char *str)
 
 LongInt &LongInt::operator+=(const LongInt &rhs)
 {
-	size_t num_bits = rhs.size();
-	if (this->size() < num_bits)
-		this->resize(num_bits);
-	bool carry = 0;
-	size_t index;
-	for (index = 0; index < num_bits; index++)
-	{
-		if ((*this)[index] && rhs[index]) {
-			if (carry)
-				this->set_bit(index);
-			else
-				this->clear_bit(index);
-			carry = 1;
-		} else if (!((*this)[index] || rhs[index])) {
-			if (carry)
-				this->set_bit(index);
-			else
-				this->clear_bit(index);
-			carry = 0;
-		} else {
-			if (carry)
-				this->clear_bit(index);
-			else
-				this->set_bit(index);
-			carry = !(*this)[index];
-		}
+	/* check zeroes first*/
+	if (rhs.is_zero())
+		return *this;
+
+	if (is_zero()) {
+		LongInt rhs_copy(rhs);
+		swap(rhs_copy);
+		return *this;
 	}
 
-	num_bits = this->size();
+	/* Adding leading zeroes to sum with */
+	size_t rhs_bits = rhs.size();
+	if (this->size() <= rhs_bits)
+		this->resize(rhs_bits + BITS_PER_TYPE); /*reserve place for overflow*/
+
+	size_t i;
+	bool carry = 0;
+	size_t rhs_storage_size = rhs.storage.size();
+	for (i = 0; i < rhs_storage_size; i++)
+	{
+		unsigned int sum = this->storage[i] + rhs.storage[i] + carry;
+		carry = MAX_CONTAINER_ITEM_VALUE - this->storage[i] < rhs.storage[i] + carry;
+		this->storage[i] = sum;
+	}
+
+	size_t storage_size = storage.size();
 	while (carry)
-		if (index < num_bits) {
-			carry = (*this)[index];
-			if(carry)
-				clear_bit(index);
-			else
-				set_bit(index);
-			index++;
+		if (i < storage_size) {
+			carry = (this->storage[i] == MAX_CONTAINER_ITEM_VALUE);
+			this->storage[i] += 1;
+			i++;
 		} else {
 			push_back(1);
 			return *this;
 		}
+	/* TODO this looks like a workaround
+	 * might reserve bits more accurate
+	 * to be more safe in case of an exception*/
+	remove_leading_zeroes();
 	return *this;
 }
 
